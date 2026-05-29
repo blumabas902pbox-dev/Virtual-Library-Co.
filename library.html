@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Library - Public Domain Sanctuary</title>
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            background-color: #020208;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: #f3f4f6;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .aurora-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            overflow: hidden;
+            background: radial-gradient(circle at 50% -20%, #0d1b3e 0%, #020208 70%);
+        }
+
+        .aurora-glow {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.35;
+            mix-blend-mode: screen;
+            animation: drift 25s infinite alternate ease-in-out;
+        }
+
+        .glow-1 {
+            top: -10%;
+            left: 20%;
+            width: 50vw;
+            height: 50vw;
+            background: radial-gradient(circle, #1e40af 0%, transparent 70%);
+            animation-duration: 20s;
+        }
+
+        .glow-2 {
+            top: -5%;
+            right: 15%;
+            width: 45vw;
+            height: 45vw;
+            background: radial-gradient(circle, #06b6d4 0%, transparent 70%);
+            animation-duration: 28s;
+            animation-delay: -5s;
+        }
+
+        .glow-3 {
+            top: 20%;
+            left: 35%;
+            width: 40vw;
+            height: 40vw;
+            background: radial-gradient(circle, #0f172a 0%, transparent 70%);
+            animation-duration: 35s;
+        }
+
+        @keyframes drift {
+            0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+            50% { transform: translate(6%, 8%) scale(1.1) rotate(180deg); }
+            100% { transform: translate(-4%, -5%) scale(0.9) rotate(360deg); }
+        }
+
+        header {
+            text-align: center;
+            padding: 2rem 1rem 1rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            font-weight: 300;
+            letter-spacing: 3px;
+            color: #ffffff;
+            text-shadow: 0 0 20px rgba(38, 99, 231, 0.6);
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            font-size: 0.85rem;
+            color: #9ca3af;
+            letter-spacing: 1px;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-container {
+            max-width: 90%;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .search-bar {
+            width: 100%;
+            padding: 10px 16px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 30px;
+            color: #fff;
+            font-size: 0.9rem;
+            outline: none;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .search-bar:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .library-container {
+            width: 100%;
+            max-width: 1250px;
+            margin: 0 auto;
+            padding: 0 6px 1.5rem 6px;
+            position: relative;
+            z-index: 5;
+        }
+
+        .storage-cabinet {
+            background: linear-gradient(to bottom, rgba(16, 12, 8, 0.96), rgba(8, 6, 4, 0.98));
+            border-left: 10px solid #2e1c0c;
+            border-right: 10px solid #2e1c0c;
+            border-top: 18px solid #3d2612;
+            border-bottom: 10px solid #2e1c0c;
+            border-radius: 8px;
+            box-shadow: 
+                inset 0 0 40px rgba(0, 0, 0, 0.95),
+                0 20px 40px rgba(0, 0, 0, 0.85);
+            padding: 1.5rem 0 0 0;
+            width: 100%;
+        }
+
+        .shelf-row {
+            margin-bottom: 2.8rem;
+            position: relative;
+            width: 100%;
+        }
+        .shelf-row:last-child {
+            margin-bottom: 0px !important;
+        }
+
+        .shelf-books {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding: 0 2px;
+            height: 110px;
+            gap: 1px;
+            position: relative;
+            z-index: 2;
+            width: 100%;
+        }
+
+        .shelf-base {
+            width: 100%;
+            height: 12px;
+            background: repeating-linear-gradient(
+                to bottom,
+                #442e19 0px, #442e19 2px,
+                #23160a 2px, #23160a 4px,
+                #4e3620 4px, #4e3620 6px
+            );
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            border-bottom: 2px solid rgba(0, 0, 0, 0.9);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.8);
+            position: relative;
+        }
+
+        .shelf-base::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, #20140a 0%, #301f10 25%, #1c1108 50%, #3a2513 75%, #20140a 100%);
+            transform: perspective(100px) rotateX(20deg);
+            transform-origin: bottom center;
+            box-shadow: inset 0 -2px 5px rgba(0,0,0,0.95);
+            z-index: 1;
+        }
+
+        .book {
+            position: relative;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            flex-shrink: 1; 
+            min-width: 9px;
+            width: calc(var(--raw-w) * 0.35);
+            height: calc(var(--raw-h) * 0.48);
+            box-shadow: 
+                inset 2px 0 3px rgba(0, 0, 0, 0.6),
+                inset -1px 0 2px rgba(0, 0, 0, 0.4),
+                2px 1px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .book::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(to right, 
+                    rgba(0,0,0,0.5) 0%, 
+                    rgba(0,0,0,0.1) 6%, 
+                    rgba(255,255,255,0.08) 10%, 
+                    transparent 18%, 
+                    transparent 85%, 
+                    rgba(0,0,0,0.45) 100%
+                ),
+                repeating-linear-gradient(to bottom, transparent 0px, transparent 20px, rgba(0, 0, 0, 0.3) 21px, rgba(234, 179, 8, 0.15) 22px, transparent 23px);
+            border-radius: inherit;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .book::after {
+            content: '';
+            position: absolute;
+            left: 12%;
+            width: 76%;
+            height: 100%;
+            top: 0;
+            background: 
+                linear-gradient(to bottom, transparent 6px, rgba(212, 175, 55, 0.4) 6px, rgba(212, 175, 55, 0.4) 7px, transparent 7px),
+                linear-gradient(to top, transparent 6px, rgba(212, 175, 55, 0.4) 6px, rgba(212, 175, 55, 0.4) 7px, transparent 7px);
+            pointer-events: none;
+            z-index: 3;
+        }
+
+        .book.pose-upright {
+            transform-origin: bottom center;
+            border-radius: 2px 1px 1px 2px;
+        }
+        .book.pose-upright:hover {
+            transform: translateY(-10px) scale(1.05);
+            z-index: 10;
+            box-shadow: 0 8px 16px rgba(59, 130, 246, 0.5);
+        }
+        .book.pose-upright .book-title,
+        .book.pose-tilted-left .book-title,
+        .book.pose-tilted-right .book-title {
+            writing-mode: vertical-rl;
+            width: max-content;
+            height: 85%;
+            transform: translate(-50%, -50%) rotate(180deg) scale(0.52);
+        }
+
+        .book.pose-tilted-left {
+            transform: rotate(-2deg);
+            transform-origin: bottom right;
+            border-radius: 2px 1px 1px 2px;
+        }
+        .book.pose-tilted-left:hover {
+            transform: rotate(0deg) translateY(-10px) scale(1.05);
+            z-index: 10;
+        }
+
+        .book.pose-tilted-right {
+            transform: rotate(2deg);
+            transform-origin: bottom left;
+            border-radius: 1px 2px 2px 1px;
+        }
+        .book.pose-tilted-right:hover {
+            transform: rotate(0deg) translateY(-10px) scale(1.05);
+            z-index: 10;
+        }
+
+        .horizontal-stack {
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: center;
+            justify-content: flex-end;
+            margin: 0 1px;
+            position: relative;
+            z-index: 2;
+            flex-shrink: 1;
+        }
+
+        .book.pose-horizontal {
+            border-radius: 1px 1px 2px 2px;
+            margin-bottom: 1px;
+            width: calc((var(--raw-h) - 30px) * 0.35);
+            height: calc(var(--raw-w) * 0.48);
+        }
+        .book.pose-horizontal:hover {
+            transform: translateX(6px) scale(1.03);
+            z-index: 10;
+        }
+        .book.pose-horizontal .book-title {
+            writing-mode: horizontal-tb;
+            transform: translate(-50%, -50%) scale(0.58);
+            width: 100%;
+            height: auto;
+            padding: 0 2px;
+        }
+
+        .book-title {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            text-align: center;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.1px;
+            color: rgba(245, 245, 240, 0.92);
+            text-shadow: -1px -1px 0px rgba(0, 0, 0, 0.7);
+            max-height: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            z-index: 4;
+            pointer-events: none;
+        }
+
+        .book-tooltip {
+            position: absolute;
+            bottom: 112%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-4px);
+            background: rgba(11, 14, 24, 0.98);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            padding: 10px 14px;
+            border-radius: 6px;
+            width: 180px;
+            text-align: center;
+            box-shadow: 0 10px 24px rgba(0,0,0,0.8);
+            backdrop-filter: blur(8px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            z-index: 100;
+            writing-mode: horizontal-tb !important;
+            transform-origin: bottom center;
+        }
+
+        .book-tooltip h3 {
+            font-size: 0.85rem;
+            color: #fff;
+            margin-bottom: 2px;
+            white-space: normal;
+        }
+
+        .book-tooltip p {
+            font-size: 0.72rem;
+            color: #9ca3af;
+            white-space: normal;
+        }
+
+        .book:hover .book-tooltip {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-8px);
+        }
+
+        @media (min-width: 768px) {
+            header {
+                padding: 3rem 2rem 1.5rem;
+            }
+            header h1 {
+                font-size: 3rem;
+            }
+            header p {
+                font-size: 1rem;
+            }
+            .search-container {
+                max-width: 500px;
+            }
+            .library-container {
+                padding: 0 0 1.5rem 0;
+            }
+            .storage-cabinet {
+                border-left: 24px solid #2e1c0c;
+                border-right: 24px solid #2e1c0c;
+                border-top: 32px solid #3d2612;
+                border-bottom: 24px solid #2e1c0c;
+                padding: 4rem 0 0 0;
+            }
+            .shelf-row {
+                margin-bottom: 5.5rem;
+            }
+            .shelf-row:last-child {
+                margin-bottom: 0px !important;
+            }
+            .shelf-books {
+                height: 250px;
+                gap: 16px;
+                padding: 0 30px;
+            }
+            .shelf-base {
+                height: 22px;
+                background: repeating-linear-gradient(
+                    to bottom,
+                    #442e19 0px, #442e19 3px,
+                    #23160a 3px, #23160a 5px,
+                    #4e3620 5px, #4e3620 8px,
+                    #1b1006 8px, #1b1006 10px
+                );
+            }
+            .shelf-base::before {
+                content: '';
+                top: -10px;
+                height: 10px;
+            }
+            .book {
+                width: var(--raw-w);
+                height: var(--raw-h);
+                min-width: auto;
+            }
+            .book::before {
+                background: 
+                    linear-gradient(to right, 
+                        rgba(0,0,0,0.5) 0%, 
+                        rgba(0,0,0,0.1) 6%, 
+                        rgba(255,255,255,0.08) 10%, 
+                        transparent 18%, 
+                        transparent 85%, 
+                        rgba(0,0,0,0.45) 100%
+                    ),
+                    repeating-linear-gradient(to bottom, transparent 0px, transparent 36px, rgba(0, 0, 0, 0.35) 37px, rgba(234, 179, 8, 0.2) 38px, transparent 39px);
+            }
+            .book::after {
+                background: 
+                    linear-gradient(to bottom, transparent 10px, rgba(212, 175, 55, 0.45) 10px, rgba(212, 175, 55, 0.45) 12px, transparent 12px),
+                    linear-gradient(to top, transparent 10px, rgba(212, 175, 55, 0.45) 10px, rgba(212, 175, 55, 0.45) 12px, transparent 12px);
+            }
+            .book.pose-upright:hover,
+            .book.pose-tilted-left:hover,
+            .book.pose-tilted-right:hover {
+                transform: translateY(-16px) scale(1.04);
+            }
+            .book.pose-upright .book-title,
+            .book.pose-tilted-left .book-title,
+            .book.pose-tilted-right .book-title {
+                transform: translate(-50%, -50%) rotate(180deg) scale(1);
+                width: max-content;
+                height: 85%;
+            }
+            .book.pose-tilted-left {
+                transform: rotate(-5deg);
+                margin-right: 20px;
+            }
+            .book.pose-tilted-right {
+                transform: rotate(5deg);
+                margin-left: 20px;
+            }
+            .horizontal-stack {
+                margin: 0 12px;
+            }
+            .book.pose-horizontal {
+                width: calc(var(--raw-h) - 30px);
+                height: var(--raw-w);
+                margin-bottom: 3px;
+            }
+            .book.pose-horizontal:hover {
+                transform: translateX(10px) scale(1.02);
+            }
+            .book.pose-horizontal .book-title {
+                transform: translate(-50%, -50%) scale(1);
+                padding: 4px;
+                width: 100%;
+                height: auto;
+            }
+            .book-title {
+                font-size: 0.72rem;
+            }
+            .book-tooltip {
+                width: 210px;
+            }
+        }
+
+        footer {
+            text-align: center;
+            color: #4b5563;
+            font-size: 0.85rem;
+            padding: 1rem 2rem 2rem;
+            width: 100%;
+        }
+    </style>
+    
+</head>
+<body>
+
+    <div class="aurora-container">
+        <div class="aurora-glow glow-1"></div>
+        <div class="aurora-glow glow-2"></div>
+        <div class="aurora-glow glow-3"></div>
+    </div>
+
+    <header>
+        <h1>VIRTUAL LIBRARY</h1>
+        <p>A Public Domain Sanctuary &bull; 100 Literary Masterpieces</p>
+        <div class="search-container">
+            <input type="text" id="searchBar" class="search-bar" placeholder="Search by title or author...">
+        </div>
+    </header>
+
+    <main class="library-container">
+        <div class="storage-cabinet" id="libraryShelves"></div>
+    </main>
+
+    <footer>
+        &copy; 2026 Virtual Library. All cataloged entries exist strictly within the public domain.
+    </footer>
+
+    <script>
+        const catalog = [
+            { title: "Pride and Prejudice", author: "Jane Austen", url: "https://www.gutenberg.org/ebooks/1342" },
+            { title: "Frankenstein", author: "Mary Shelley", url: "https://www.gutenberg.org/ebooks/84" },
+            { title: "The Great Gatsby", author: "F. Scott Fitzgerald", url: "https://www.gutenberg.org/ebooks/64317" },
+            { title: "Dracula", author: "Bram Stoker", url: "https://www.gutenberg.org/ebooks/345" },
+            { title: "Alice in Wonderland", author: "Lewis Carroll", url: "https://www.gutenberg.org/ebooks/11" },
+            { title: "The Metamorphosis", author: "Franz Kafka", url: "https://www.gutenberg.org/ebooks/5200" },
+            { title: "Moby Dick", author: "Herman Melville", url: "https://www.gutenberg.org/ebooks/2701" },
+            { title: "Sherlock Holmes Adventures", author: "Arthur Conan Doyle", url: "https://www.gutenberg.org/ebooks/1661" },
+            { title: "The Picture of Dorian Gray", author: "Oscar Wilde", url: "https://www.gutenberg.org/ebooks/174" },
+            { title: "A Tale of Two Cities", author: "Charles Dickens", url: "https://www.gutenberg.org/ebooks/98" },
+            { title: "Jane Eyre", author: "Charlotte Brontë", url: "https://www.gutenberg.org/ebooks/1260" },
+            { title: "The Count of Monte Cristo", author: "Alexandre Dumas", url: "https://www.gutenberg.org/ebooks/1184" },
+            { title: "The Odyssey", author: "Homer", url: "https://www.gutenberg.org/ebooks/1727" },
+            { title: "Crime and Punishment", author: "Fyodor Dostoevsky", url: "https://www.gutenberg.org/ebooks/2554" },
+            { title: "The Iliad", author: "Homer", url: "https://www.gutenberg.org/ebooks/6130" },
+            { title: "Wuthering Heights", author: "Emily Brontë", url: "https://www.gutenberg.org/ebooks/768" },
+            { title: "Les Misérables", author: "Victor Hugo", url: "https://www.gutenberg.org/ebooks/135" },
+            { title: "Don Quixote", author: "Miguel de Cervantes", url: "https://www.gutenberg.org/ebooks/996" },
+            { title: "The Time Machine", author: "H.G. Wells", url: "https://www.gutenberg.org/ebooks/35" },
+            { title: "The War of the Worlds", author: "H.G. Wells", url: "https://www.gutenberg.org/ebooks/36" },
+            { title: "The Prophet", author: "Kahlil Gibran", url: "https://www.gutenberg.org/ebooks/58585" },
+            { title: "The Yellow Wallpaper", author: "Charlotte Perkins Gilman", url: "https://www.gutenberg.org/ebooks/1952" },
+            { title: "Ulysses", author: "James Joyce", url: "https://www.gutenberg.org/ebooks/4300" },
+            { title: "Being Earnest", author: "Oscar Wilde", url: "https://www.gutenberg.org/ebooks/844" },
+            { title: "Huckleberry Finn", author: "Mark Twain", url: "https://www.gutenberg.org/ebooks/76" },
+            { title: "The Scarlet Letter", author: "Nathaniel Hawthorne", url: "https://www.gutenberg.org/ebooks/33" },
+            { title: "Treasure Island", author: "Robert Louis Stevenson", url: "https://www.gutenberg.org/ebooks/120" },
+            { title: "Dr. Jekyll and Mr. Hyde", author: "Robert Louis Stevenson", url: "https://www.gutenberg.org/ebooks/43" },
+            { title: "Heart of Darkness", author: "Joseph Conrad", url: "https://www.gutenberg.org/ebooks/219" },
+            { title: "The Awakening", author: "Kate Chopin", url: "https://www.gutenberg.org/ebooks/160" },
+            { title: "Walden", author: "Henry David Thoreau", url: "https://www.gutenberg.org/ebooks/205" },
+            { title: "The Souls of Black Folk", author: "W.E.B. Du Bois", url: "https://www.gutenberg.org/ebooks/408" },
+            { title: "Grimms' Fairy Tales", author: "Jacob & Wilhelm Grimm", url: "https://www.gutenberg.org/ebooks/2591" },
+            { title: "Peter Pan", author: "J. M. Barrie", url: "https://www.gutenberg.org/ebooks/16" },
+            { title: "The Secret Garden", author: "Frances Hodgson Burnett", url: "https://www.gutenberg.org/ebooks/17396" },
+            { title: "Little Women", author: "Louisa May Alcott", url: "https://www.gutenberg.org/ebooks/514" },
+            { title: "The Wind in the Willows", author: "Kenneth Grahame", url: "https://www.gutenberg.org/ebooks/27805" },
+            { title: "A Study in Scarlet", author: "Arthur Conan Doyle", url: "https://www.gutenberg.org/ebooks/284" },
+            { title: "The Call of the Wild", author: "Jack London", url: "https://www.gutenberg.org/ebooks/215" },
+            { title: "The Prince", author: "Niccolò Machiavelli", url: "https://www.gutenberg.org/ebooks/1232" },
+            { title: "The Republic", author: "Plato", url: "https://www.gutenberg.org/ebooks/1497" },
+            { title: "Beyond Good and Evil", author: "Friedrich Nietzsche", url: "https://www.gutenberg.org/ebooks/4363" },
+            { title: "The Art of War", author: "Sun Tzu", url: "https://www.gutenberg.org/ebooks/132" },
+            { title: "Siddhartha", author: "Hermann Hesse", url: "https://www.gutenberg.org/ebooks/2500" },
+            { title: "Emma", author: "Jane Austen", url: "https://www.gutenberg.org/ebooks/158" },
+            { title: "Sense and Sensibility", author: "Jane Austen", url: "https://www.gutenberg.org/ebooks/161" },
+            { title: "Great Expectations", author: "Charles Dickens", url: "https://www.gutenberg.org/ebooks/1400" },
+            { title: "The Hound of the Baskervilles", author: "Arthur Conan Doyle", url: "https://www.gutenberg.org/ebooks/2852" },
+            { title: "Gulliver's Travels", author: "Jonathan Swift", url: "https://www.gutenberg.org/ebooks/829" },
+            { title: "The Brothers Karamazov", author: "Fyodor Dostoevsky", url: "https://www.gutenberg.org/ebooks/28054" },
+            { title: "The Invisible Man", author: "H.G. Wells", url: "https://www.gutenberg.org/ebooks/5230" },
+            { title: "The Jungle Book", author: "Rudyard Kipling", url: "https://www.gutenberg.org/ebooks/236" },
+            { title: "Tom Sawyer", author: "Mark Twain", url: "https://www.gutenberg.org/ebooks/74" },
+            { title: "The King in Yellow", author: "Robert W. Chambers", url: "https://www.gutenberg.org/ebooks/8492" },
+            { title: "The Dunwich Horror", author: "H.P. Lovecraft", url: "https://www.gutenberg.org/ebooks/50133" },
+            { title: "Sleepy Hollow", author: "Washington Irving", url: "https://www.gutenberg.org/ebooks/41" },
+            { title: "The Divine Comedy", author: "Dante Alighieri", url: "https://www.gutenberg.org/ebooks/8800" },
+            { title: "The Phantom of the Opera", author: "Gaston Leroux", url: "https://www.gutenberg.org/ebooks/175" },
+            { title: "Anna Karenina", author: "Leo Tolstoy", url: "https://www.gutenberg.org/ebooks/1399" },
+            { title: "War and Peace", author: "Leo Tolstoy", url: "https://www.gutenberg.org/ebooks/2600" },
+            { title: "The Age of Innocence", author: "Edith Wharton", url: "https://www.gutenberg.org/ebooks/541" },
+            { title: "The House of Mirth", author: "Edith Wharton", url: "https://www.gutenberg.org/ebooks/284" },
+            { title: "Ethan Frome", author: "Edith Wharton", url: "https://www.gutenberg.org/ebooks/571" },
+            { title: "Kidnapped", author: "Robert Louis Stevenson", url: "https://www.gutenberg.org/ebooks/421" },
+            { title: "Robin Hood", author: "Howard Pyle", url: "https://www.gutenberg.org/ebooks/10148" },
+            { title: "The Secret Adversary", author: "Agatha Christie", url: "https://www.gutenberg.org/ebooks/1155" },
+            { title: "Affair at Styles", author: "Agatha Christie", url: "https://www.gutenberg.org/ebooks/863" },
+            { title: "Murder on the Links", author: "Agatha Christie", url: "https://www.gutenberg.org/ebooks/58691" },
+            { title: "Man in the Brown Suit", author: "Agatha Christie", url: "https://www.gutenberg.org/ebooks/61168" },
+            { title: "A Portrait of the Artist", author: "James Joyce", url: "https://www.gutenberg.org/ebooks/42671" },
+            { title: "Dubliners", author: "James Joyce", url: "https://www.gutenberg.org/ebooks/2814" },
+            { title: "The Pit and the Pendulum", author: "Edgar Allan Poe", url: "https://www.gutenberg.org/ebooks/10620" },
+            { title: "The Raven", author: "Edgar Allan Poe", url: "https://www.gutenberg.org/ebooks/1065" },
+            { title: "House of Usher", author: "Edgar Allan Poe", url: "https://www.gutenberg.org/ebooks/932" },
+            { title: "Rue Morgue Murders", author: "Edgar Allan Poe", url: "https://www.gutenberg.org/ebooks/2147" },
+            { title: "The Turn of the Screw", author: "Henry James", url: "https://www.gutenberg.org/ebooks/209" },
+            { title: "The Portrait of a Lady", author: "Henry James", url: "https://www.gutenberg.org/ebooks/205" },
+            { title: "The Bostonians", author: "Henry James", url: "https://www.gutenberg.org/ebooks/4279" },
+            { title: "Tarzan of the Apes", author: "Edgar Rice Burroughs", url: "https://www.gutenberg.org/ebooks/81" },
+            { title: "The Gods of Mars", author: "Edgar Rice Burroughs", url: "https://www.gutenberg.org/ebooks/62" },
+            { title: "A Princess of Mars", author: "Edgar Rice Burroughs", url: "https://www.gutenberg.org/ebooks/62" },
+            { title: "At the Earth's Core", author: "Edgar Rice Burroughs", url: "https://www.gutenberg.org/ebooks/123" },
+            { title: "Beast in the Jungle", author: "Henry James", url: "https://www.gutenberg.org/ebooks/1093" },
+            { title: "Island of Dr. Moreau", author: "H.G. Wells", url: "https://www.gutenberg.org/ebooks/159" },
+            { title: "The Food of the Gods", author: "H.G. Wells", url: "https://www.gutenberg.org/ebooks/2736" },
+            { title: "First Men in the Moon", author: "H.G. Wells", url: "https://www.gutenberg.org/ebooks/1013" },
+            { title: "The Sea-Wolf", author: "Jack London", url: "https://www.gutenberg.org/ebooks/1074" },
+            { title: "White Fang", author: "Jack London", url: "https://www.gutenberg.org/ebooks/910" },
+            { title: "The Iron Heel", author: "Jack London", url: "https://www.gutenberg.org/ebooks/1164" },
+            { title: "Last of the Mohicans", author: "James Fenimore Cooper", url: "https://www.gutenberg.org/ebooks/983" },
+            { title: "The Deerslayer", author: "James Fenimore Cooper", url: "https://www.gutenberg.org/ebooks/1898" },
+            { title: "The Pathfinder", author: "James Fenimore Cooper", url: "https://www.gutenberg.org/ebooks/2242" },
+            { title: "Oliver Twist", author: "Charles Dickens", url: "https://www.gutenberg.org/ebooks/730" },
+            { title: "David Copperfield", author: "Charles Dickens", url: "https://www.gutenberg.org/ebooks/766" },
+            { title: "Bleak House", author: "Charles Dickens", url: "https://www.gutenberg.org/ebooks/1023" },
+            { title: "Hard Times", author: "Charles Dickens", url: "https://www.gutenberg.org/ebooks/786" },
+            { title: "Nicholas Nickleby", author: "Charles Dickens", url: "https://www.gutenberg.org/ebooks/967" },
+            { title: "Old Curiosity Shop", author: "Charles Dickens", url: "https://www.gutenberg.org/ebooks/700" },
+            { title: "The Pickwick Papers", author: "Charles Dickens", url: "https://www.gutenberg.org/ebooks/580" },
+            { title: "A Christmas Carol", author: "Charles Dickens", url: "https://www.gutenberg.org/ebooks/46" }
+        ];
+
+        const spinePalettes = [
+            "linear-gradient(to right, #7a1f1d, #420f0e)", 
+            "linear-gradient(to right, #1b365d, #0d1b30)", 
+            "linear-gradient(to right, #1e4620, #0f2410)", 
+            "linear-gradient(to right, #4a3b32, #261e19)", 
+            "linear-gradient(to right, #5c3a21, #301e11)", 
+            "linear-gradient(to right, #1c1c1c, #0a0a0a)"  
+        ];
+
+        const libraryShelves = document.getElementById('libraryShelves');
+        const searchBar = document.getElementById('searchBar');
+
+        function createBookElement(book, globalIndex, poseOverride = null) {
+            const bookDiv = document.createElement('div');
+            const palette = spinePalettes[globalIndex % spinePalettes.length];
+            
+            let pose = poseOverride;
+            if (!pose) {
+                const roll = Math.random();
+                if (roll < 0.70) pose = "upright";
+                else if (roll < 0.85) pose = "tilted-left";
+                else pose = "tilted-right";
+            }
+
+            bookDiv.className = `book pose-${pose}`;
+            bookDiv.style.background = palette;
+            bookDiv.setAttribute('onclick', `window.open('${book.url}', '_blank')`);
+
+            let spineWidth = Math.floor(Math.random() * (42 - 34 + 1)) + 34;
+            let spineHeight = Math.floor(Math.random() * (215 - 190 + 1)) + 190;
+
+            bookDiv.style.setProperty('--raw-w', `${spineWidth}px`);
+            bookDiv.style.setProperty('--raw-h', `${spineHeight}px`);
+
+            bookDiv.innerHTML = `
+                <div class="book-title">${book.title}</div>
+                <div class="book-tooltip">
+                    <h3>${book.title}</h3>
+                    <p>by ${book.author}</p>
+                    <span style="font-size: 11px; color:#3b82f6; display:inline-block; margin-top:8px;">Click to Open Free eCopy &rarr;</span>
+                </div>
+            `;
+            return bookDiv;
+        }
+
+        function renderLibrary(filteredBooks) {
+            libraryShelves.innerHTML = '';
+            if(filteredBooks.length === 0) {
+                libraryShelves.innerHTML = `<div style="text-align:center; padding: 3rem 1rem; color: #6b7280;">No matching entries found inside the cabinet.</div>`;
+                return;
+            }
+
+            const maxShelves = 6;
+            const shelvesData = Array.from({ length: maxShelves }, () => []);
+
+            filteredBooks.forEach((book, index) => {
+                const targetShelf = index % maxShelves;
+                shelvesData[targetShelf].push({ book, globalIndex: index });
+            });
+
+            shelvesData.forEach(shelfBooksData => {
+                if (shelfBooksData.length === 0) return;
+
+                const shelfRow = document.createElement('div');
+                shelfRow.className = 'shelf-row';
+                const shelfBooksContainer = document.createElement('div');
+                shelfBooksContainer.className = 'shelf-books';
+
+                for (let i = 0; i < shelfBooksData.length; i++) {
+                    const currentItem = shelfBooksData[i];
+
+                    if (Math.random() < 0.12 && i < shelfBooksData.length - 1) {
+                        const stackWrapper = document.createElement('div');
+                        stackWrapper.className = 'horizontal-stack';
+                        
+                        stackWrapper.appendChild(createBookElement(currentItem.book, currentItem.globalIndex, "horizontal"));
+                        i++;
+                        const nextItem = shelfBooksData[i];
+                        stackWrapper.appendChild(createBookElement(nextItem.book, nextItem.globalIndex, "horizontal"));
+                        
+                        shelfBooksContainer.appendChild(stackWrapper);
+                    } else {
+                        shelfBooksContainer.appendChild(createBookElement(currentItem.book, currentItem.globalIndex));
+                    }
+                }
+
+                const shelfBase = document.createElement('div');
+                shelfBase.className = 'shelf-base';
+                
+                shelfRow.appendChild(shelfBooksContainer);
+                shelfRow.appendChild(shelfBase);
+                libraryShelves.appendChild(shelfRow);
+            });
+        }
+
+        searchBar.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            const filtered = catalog.filter(book => 
+                book.title.toLowerCase().includes(query) || 
+                book.author.toLowerCase().includes(query)
+            );
+            renderLibrary(filtered);
+        });
+        renderLibrary(catalog);
+    </script>
+    
+</body>
+</html>
